@@ -1,0 +1,116 @@
+cmake_minimum_required(VERSION 3.27)
+message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}.")
+
+########################################################################################################################
+## Define project
+########################################################################################################################
+project(
+        ModlistUpdateChecker
+        VERSION 1.0.0
+        LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+message("\nCMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+message("CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}")
+
+if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${COMPILER_FLAGS_RELWITHDEBINFO}")
+    set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "${LINKER_FLAGS_RELWITHDEBINFO}")
+    message("\nCMAKE_CXX_FLAGS_RELWITHDEBINFO: ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+    message("CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO: ${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}")
+else()
+    set(CMAKE_CXX_FLAGS_DEBUG "${COMPILER_FLAGS_DEBUG}")
+    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${LINKER_FLAGS_DEBUG}")
+    message("\nCMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG}")
+    message("CMAKE_SHARED_LINKER_FLAGS_DEBUG: ${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
+endif()
+
+include(GNUInstallDirs)
+
+configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.rc.in
+        ${CMAKE_CURRENT_BINARY_DIR}/version.rc
+        @ONLY)
+
+set(PUBLIC_HEADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}")
+set(headers
+        include/Utility.h
+        include/httplib.h)
+
+set(sources
+        src/Logging.cpp
+        src/Main.cpp
+        src/Events.cpp
+        src/Settings.cpp
+
+        ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
+
+source_group(
+        TREE ${CMAKE_CURRENT_SOURCE_DIR}
+        FILES
+        ${headers}
+        ${sources})
+
+########################################################################################################################
+## Configure target DLL
+########################################################################################################################
+find_package(CommonLibSSE CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(OpenSSL REQUIRED)
+
+add_commonlibsse_plugin(${PROJECT_NAME} SOURCES ${headers} ${sources})
+add_library("${PROJECT_NAME}::${PROJECT_NAME}" ALIAS "${PROJECT_NAME}")
+
+find_path(SIMPLEINI_INCLUDE_DIRS "ConvertUTF.c")
+
+target_link_libraries(${PROJECT_NAME}
+        PRIVATE
+        CommonLibSSE::CommonLibSSE
+        nlohmann_json::nlohmann_json
+        OpenSSL::SSL
+        OpenSSL::Crypto)
+
+target_include_directories(${PROJECT_NAME}
+        PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
+        $<INSTALL_INTERFACE:src>
+        ${SIMPLEINI_INCLUDE_DIRS})
+
+target_include_directories(${PROJECT_NAME}
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+
+target_precompile_headers(${PROJECT_NAME}
+        PRIVATE
+        include/PCH.h)
+
+install(DIRECTORY "${PUBLIC_HEADER_DIR}"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+
+install(TARGETS ${PROJECT_NAME}
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+
+########################################################################################################################
+## Automatic plugin deployment
+########################################################################################################################
+# Automatic deployment to FOMOD directory.
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(BUILD_NAME "Debug")
+else()
+    set(BUILD_NAME "Release")
+endif()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Plugin${BUILD_NAME}/skse/plugins")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Plugin${BUILD_NAME}/skse/plugins")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_PDB_FILE:${PROJECT_NAME}> "${CMAKE_CURRENT_SOURCE_DIR}/contrib/Plugin${BUILD_NAME}/skse/plugins")
+file(GLOB_RECURSE OUTPUT_DLLS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/**/*.dll")
+file(GLOB_RECURSE OUTPUT_PDBS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/**/*.pdb")
+set_property(TARGET ${PROJECT_NAME}
+        APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${OUTPUT_DLLS}")
+set_property(TARGET ${PROJECT_NAME}
+        APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${OUTPUT_PDBS}")
