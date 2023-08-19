@@ -1,22 +1,6 @@
 #pragma once
 
-#include "Settings.h"
-
-class Utility {
-protected:
-    Utility() = default;
-    ~Utility() = default;
-
+class Utility : public Singleton<Utility> {
 public:
-    Utility(const Utility&) = delete;            // Prevent copy construction
-    Utility(Utility&&) = delete;                 // Prevent move construction
-    Utility& operator=(const Utility&) = delete; // Prevent copy assignment
-    Utility& operator=(Utility&&) = delete;      // Prevent move assignment
-
-    static Utility* GetSingleton() {
-        static Utility singleton;
-        return std::addressof(singleton);
-    }
-
     inline static bool first_run = true;
 };

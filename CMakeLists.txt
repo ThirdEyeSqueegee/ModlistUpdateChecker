@@ -6,7 +6,7 @@ message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}.")
 ########################################################################################################################
 project(
         ModlistUpdateChecker
-        VERSION 1.0.0
+        VERSION 1.0.1
         LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,17 +14,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 message("\nCMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 message("CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}")
 
-if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${COMPILER_FLAGS_RELWITHDEBINFO}")
-    set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "${LINKER_FLAGS_RELWITHDEBINFO}")
-    message("\nCMAKE_CXX_FLAGS_RELWITHDEBINFO: ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-    message("CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO: ${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}")
-else()
-    set(CMAKE_CXX_FLAGS_DEBUG "${COMPILER_FLAGS_DEBUG}")
-    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${LINKER_FLAGS_DEBUG}")
-    message("\nCMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG}")
-    message("CMAKE_SHARED_LINKER_FLAGS_DEBUG: ${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
-endif()
+message("\nCMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+message("CMAKE_SHARED_LINKER_FLAGS: ${CMAKE_SHARED_LINKER_FLAGS}")
+
+message("\nCMAKE_CXX_FLAGS_RELWITHDEBINFO: ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+message("CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO: ${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}")
+
+message("\nCMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG}")
+message("CMAKE_SHARED_LINKER_FLAGS_DEBUG: ${CMAKE_SHARED_LINKER_FLAGS_DEBUG}")
 
 include(GNUInstallDirs)
 
@@ -59,14 +56,13 @@ find_package(CommonLibSSE CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(OpenSSL REQUIRED)
 
-add_commonlibsse_plugin(${PROJECT_NAME} SOURCES ${headers} ${sources})
+add_commonlibsse_plugin(${PROJECT_NAME} AUTHOR ThirdEyeSqueegee SOURCES ${headers} ${sources})
 add_library("${PROJECT_NAME}::${PROJECT_NAME}" ALIAS "${PROJECT_NAME}")
 
-find_path(SIMPLEINI_INCLUDE_DIRS "ConvertUTF.c")
+find_path(SIMPLEINI_INCLUDE_DIRS "SimpleIni.h")
 
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
-        CommonLibSSE::CommonLibSSE
         nlohmann_json::nlohmann_json
         OpenSSL::SSL
         OpenSSL::Crypto)
@@ -95,7 +91,6 @@ install(TARGETS ${PROJECT_NAME}
 ########################################################################################################################
 ## Automatic plugin deployment
 ########################################################################################################################
-# Automatic deployment to FOMOD directory.
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(BUILD_NAME "Debug")
 else()

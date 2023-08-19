@@ -2,11 +2,6 @@
 
 #include "SimpleIni.h"
 
-Settings* Settings::GetSingleton() {
-    static Settings singleton;
-    return std::addressof(singleton);
-}
-
 void Settings::LoadSettings() {
     logger::info("Loading settings");
 
@@ -22,12 +17,13 @@ void Settings::LoadSettings() {
         logger::debug("Debug logging enabled");
     }
 
-    use_wj = ini.GetBoolValue("General", "bUseWJ");
-    use_loadorderlibrary = ini.GetBoolValue("General", "bUseLoadOrderLibrary");
+    use_wj = ini.GetBoolValue("Wabbajack", "bUseWJ");
+    use_loadorderlibrary = ini.GetBoolValue("LoadOrderLibrary", "bUseLoadOrderLibrary");
+    always_show_current_version = ini.GetBoolValue("General", "bAlwaysShowCurrentVersion");
     notification_delay = static_cast<int>(ini.GetLongValue("General", "uNotificationDelay"));
     list_name = ini.GetValue("General", "Name");
-    loadorderlibrary_endpoint = ini.GetValue("General", "Endpoint");
-    wj_machineurl = ini.GetValue("General", "MachineURL");
+    loadorderlibrary_endpoint = ini.GetValue("LoadOrderLibrary", "Endpoint");
+    wj_machineurl = ini.GetValue("Wabbajack", "MachineURL");
     current_version = ini.GetValue("General", "Version");
 
     if (wj_machineurl.contains("/")) {

@@ -1,18 +1,7 @@
 #pragma once
 
-class Settings {
-protected:
-    Settings() = default;
-    ~Settings() = default;
-
+class Settings : public Singleton<Settings> {
 public:
-    Settings(const Settings&) = delete;
-    Settings(Settings&&) = delete;
-    Settings& operator=(const Settings&) = delete;
-    Settings& operator=(Settings&&) = delete;
-
-    static Settings* GetSingleton();
-
     static void LoadSettings();
 
     inline static bool debug_logging = false;
@@ -20,6 +9,7 @@ public:
     inline static bool use_wj = false;
     inline static bool use_loadorderlibrary = false;
     inline static bool has_repo = false;
+    inline static bool always_show_current_version = true;
     inline static int notification_delay = 60;
     inline static std::string list_name = "";
     inline static std::string loadorderlibrary_endpoint = "";
