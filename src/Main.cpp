@@ -6,8 +6,7 @@
 
 void Listener(SKSE::MessagingInterface::Message* message) noexcept
 {
-    if (message->type <=> SKSE::MessagingInterface::kDataLoaded == 0)
-    {
+    if (message->type <=> SKSE::MessagingInterface::kDataLoaded == 0) {
         Settings::LoadSettings();
         if (!Settings::disable)
             Events::OnCellFullyLoadedEventHandler::Register();

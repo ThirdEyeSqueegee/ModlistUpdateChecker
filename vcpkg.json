@@ -1,31 +1,14 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "modlist-update-checker",
-  "version-semver": "1.0.3",
-  "dependencies": [
-    "commonlibsse-ng",
-    "simpleini",
-    "nlohmann-json",
-    "openssl"
-  ],
+  "version-semver": "1.0.4",
+  "dependencies": ["fmt", "spdlog", "rapidcsv", "simpleini", "nlohmann-json", "openssl"],
   "license": "GPL-3.0-or-later",
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
       "repository": "https://github.com/microsoft/vcpkg",
-      "baseline": "436a061a544c124200200517b9ee55c5bb1b7a26"
-    },
-    "registries": [
-      {
-        "kind": "git",
-        "repository": "https://gitlab.com/colorglass/vcpkg-colorglass",
-        "baseline": "6309841a1ce770409708a67a9ba5c26c537d2937",
-        "packages": [
-          "commonlibsse-ng",
-          "script-extender-common",
-          "skse"
-        ]
-      }
-    ]
+      "baseline": "5786fcb0cb5eb08d1931a230dad9701e7a6c37f0"
+    }
   }
 }

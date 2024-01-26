@@ -12,6 +12,8 @@ public:
     inline static bool        use_loadorderlibrary{};
     inline static bool        has_repo{};
     inline static bool        always_show_current_version{};
+    inline static bool        no_save_safe_notification{};
+    inline static bool        exit_if_not_latest{};
     inline static int         notification_delay{};
     inline static std::string list_name{};
     inline static std::string loadorderlibrary_endpoint{};

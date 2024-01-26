@@ -11,16 +11,14 @@ void Settings::LoadSettings() noexcept
 
     debug_logging = ini.GetBoolValue("Log", "Debug");
 
-    if (debug_logging)
-    {
+    if (debug_logging) {
         spdlog::get("Global")->set_level(spdlog::level::level_enum::debug);
         logger::debug("Debug logging enabled");
     }
 
     disable = ini.GetBoolValue("General", "bDisable");
 
-    if (disable)
-    {
+    if (disable) {
         logger::info("bDisable set to true. Disabling...");
         return;
     }
@@ -28,14 +26,15 @@ void Settings::LoadSettings() noexcept
     use_wj                      = ini.GetBoolValue("Wabbajack", "bUseWJ");
     use_loadorderlibrary        = ini.GetBoolValue("LoadOrderLibrary", "bUseLoadOrderLibrary");
     always_show_current_version = ini.GetBoolValue("General", "bAlwaysShowCurrentVersion");
+    no_save_safe_notification   = ini.GetBoolValue("General", "bNoSaveSafeNotification");
+    exit_if_not_latest          = ini.GetBoolValue("General", "bExitIfNotLatest");
     notification_delay          = static_cast<int>(ini.GetLongValue("General", "uNotificationDelay"));
     list_name                   = ini.GetValue("General", "Name");
     loadorderlibrary_endpoint   = ini.GetValue("LoadOrderLibrary", "Endpoint");
     wj_machineurl               = ini.GetValue("Wabbajack", "MachineURL");
     current_version             = ini.GetValue("General", "Version");
 
-    if (wj_machineurl.contains('/'))
-    {
+    if (wj_machineurl.contains('/')) {
         has_repo        = true;
         machineurl_repo = wj_machineurl.substr(0, wj_machineurl.find("/"));
         machineurl_name = wj_machineurl.substr(wj_machineurl.find("/") + 1, wj_machineurl.size());
@@ -45,6 +44,8 @@ void Settings::LoadSettings() noexcept
     logger::info("Loaded settings");
     logger::info("\tbUseWJ = {}", use_wj);
     logger::info("\tbUseLoadOrderLibrary = {}", use_loadorderlibrary);
+    logger::info("\tbNoSaveSafeNotification = {}", no_save_safe_notification);
+    logger::info("\tbExitIfNotLatest = {}", exit_if_not_latest);
     logger::info("\tuNotificationDelay = {}", notification_delay);
     logger::info("\tName = {}", list_name);
     logger::info("\tEndpoint = {}", loadorderlibrary_endpoint);
