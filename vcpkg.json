@@ -2,7 +2,14 @@
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "modlist-update-checker",
   "version-semver": "1.0.4",
-  "dependencies": ["fmt", "spdlog", "rapidcsv", "simpleini", "nlohmann-json", "openssl"],
+  "dependencies": [
+    "fmt",
+    "spdlog",
+    "rapidcsv",
+    "simpleini",
+    "nlohmann-json",
+    "openssl"
+  ],
   "license": "GPL-3.0-or-later",
   "vcpkg-configuration": {
     "default-registry": {
